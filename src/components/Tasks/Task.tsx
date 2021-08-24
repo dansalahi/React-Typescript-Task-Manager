@@ -1,44 +1,62 @@
 import React, { useState, useRef, useEffect } from 'react'
 
+
 const Task: React.FC = () => {
 
 
   const titleRef = useRef<HTMLInputElement>() as React.MutableRefObject<HTMLInputElement>;
+  const btnRef = useRef<HTMLButtonElement>() as React.MutableRefObject<HTMLButtonElement>;
 
   const [tasks, setTasks] = useState<string[]>([])
   const [title, setTitle] = useState<string>('')
   const [error, setError] = useState<boolean>(false)
 
-
-  const handeAdd = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (title === "") {
-      setError(true)
-      titleRef.current.focus()
-      return
-    }
-    setTasks(prevItem => [...tasks, title])
-  }
-
-  const handleDelete = () => {
-      const items = tasks.length;
+    if(btnRef.current.innerHTML === "ADD")
+    {
+      if (title === "") {
+        setError(true)
+        titleRef.current.focus()
+        return
+      }
+      setTasks(prev => [...tasks, title])
+      setTitle('')
       
+    } else {
+        console.log('lets update')
+        console.log(title)
+    }
+   
   }
 
-  const handleUpdate = () => {
+  const handleDelete = (task: string) => {
+    const items = tasks.filter(item => task !== item)
+    setTasks(items)
+  }
+
+  const handleUpdate = (task:string) => {
+    setTitle(task)
+    titleRef.current.focus()
+    btnRef.current.innerHTML = "UPDATE"
+  
+  }
+
+  const handleSort = () => {
 
   }
 
   useEffect(() => {
-      titleRef.current.focus()
+    titleRef.current.focus()
+    btnRef.current.innerHTML = "ADD"
   }, [])
 
-  
+
 
   return (
     <div className="card">
       <div className="card-body">
-        <form onSubmit={handeAdd}>
+        <form onSubmit={handleSubmit}>
           <div className="input-group mb-3">
             <input type="text" className="form-control" placeholder="Title"
               aria-label="Title" aria-describedby="btn_title"
@@ -48,7 +66,7 @@ const Task: React.FC = () => {
             />
 
             <div className="input-group-append">
-              <button className="btn btn-outline-success" type="submit" id="btn_title">ADD</button>
+              <button className="btn btn-outline-success" ref={btnRef} type="submit" id="btn_title">ADD</button>
             </div>
           </div>
           {error && <div className="alert alert-danger">
@@ -61,9 +79,9 @@ const Task: React.FC = () => {
           {tasks && tasks.map((task, index) => (
             <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
               {task}
-              <div className="btn-group" role="group" aria-label="Basic example">
-                <button type="button" className="btn btn-primary">Edit</button>
-                <button type="button" className="btn btn-danger">Delete</button>
+              <div className="btn-group" role="group" aria-label="Control Buttons">
+                <button type="button" onClick={()=>handleUpdate(task)} className="btn btn-primary">Edit</button>
+                <button type="button" onClick={() => handleDelete(task)} className="btn btn-danger">Delete</button>
               </div>
             </li>
           ))}
